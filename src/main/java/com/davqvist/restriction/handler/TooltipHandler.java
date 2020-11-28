@@ -50,7 +50,7 @@ public class TooltipHandler{
             if( rdesc.type == RestrictionReader.RestrictionType.NEARBYBLOCKS ){
                 notification = RestrictionNotifications.getNotificationNearbyBlocks( rdesc.reverse, ( rdesc.size == null ? 0 : rdesc.size ), rdesc.block, rdesc.ignoreMeta, ( rdesc.meta == null ? 0 : rdesc.meta ), ( rdesc.amount == null ? 0 : rdesc.amount ) );
             }
-            if( rdesc.type == RestrictionReader.RestrictionType.EXPERIENCE ){
+            if( rdesc.<>type == RestrictionReader.RestrictionType.EXPERIENCE ){
                 notification = RestrictionNotifications.getNotificationExperience( rdesc.reverse, rdesc.amount );
             }
             if( rdesc.type == RestrictionReader.RestrictionType.MINHEIGHT ){
