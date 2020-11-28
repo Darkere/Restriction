@@ -4,6 +4,7 @@ import com.davqvist.restriction.utility.LogHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
+import net.minecraft.util.ResourceLocation;
 
 import java.io.File;
 import java.io.FileReader;
@@ -62,7 +63,7 @@ public class RestrictionReader{
 
             desc = new RestrictionDesciptor();
             desc.type = RestrictionType.DIMENSION;
-            desc.id = -1;
+            desc.id = "";
             block.restrictions.add( desc );
 
             root.entries.add( block );
@@ -136,7 +137,7 @@ public class RestrictionReader{
         public Integer meta;
         public boolean ignoreMeta;
         public Integer amount;
-        public Integer id;
+        public String id;
     }
 
     public enum RestrictionType{

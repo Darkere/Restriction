@@ -1,10 +1,8 @@
 package com.davqvist.restriction.utility;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.DimensionType;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 
 public class RestrictionNotifications{
 
@@ -28,12 +26,8 @@ public class RestrictionNotifications{
         return "Block must " + ( reverse ? "not " : "" ) + "be in closed room" + ( size > 0 ? " of at least " + size + " blocks in interior size" : "" ) + ( ( blockString != null && amount > 0 ) ? ( " and at least " + amount + " exposed " + blockname + "" ) : "" ) + ".";
     }
 
-    public static String getNotificationDimension( boolean reverse, int id ){
-        String dimName = "Unknown";
-        try{
-            dimName = DimensionType.getById( id ).getName();
-        } catch( IllegalArgumentException e ){ }
-        return "Block must " + ( reverse ? "not " : "" ) + "be in dimension " + dimName  + " (DIMID: " + id + ").";
+    public static String getNotificationDimension( boolean reverse, String id ){
+        return "Block must " + ( reverse ? "not " : "" ) + "be in dimension " + id ;
     }
 
     public static String getNotificationNearbyBlocks( boolean reverse, int size, String blockString, boolean ignoreMeta, int meta, int amount ){

@@ -1,29 +1,42 @@
 package com.davqvist.restriction;
 
-import com.davqvist.restriction.proxy.CommonProxy;
+import com.davqvist.restriction.config.RestrictionReader;
+import com.davqvist.restriction.handler.PlaceHandler;
+import com.davqvist.restriction.handler.RightClickHandler;
+import com.davqvist.restriction.handler.TooltipHandler;
 import com.davqvist.restriction.reference.Reference;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.loading.FMLPaths;
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION)
+import java.io.File;
+
+@Mod(Reference.MOD_ID)
 public class Restriction{
-    @Mod.Instance(Reference.MOD_ID)
-    public static Restriction instance;
 
-    @SidedProxy(clientSide = Reference.CLIENT_PROXY_CLASS, serverSide = Reference.SERVER_PROXY_CLASS)
-    public static CommonProxy proxy;
+    public static RestrictionReader rr = new RestrictionReader();
+    public Restriction(){
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+    @SubscribeEvent
+    public void init( FMLCommonSetupEvent event )
+    {
+        File configdir = FMLPaths.CONFIGDIR.get().resolve( "restriction" ).toFile();
+        if( !configdir.exists() ){
+            configdir.mkdir();
+        }
+        File file = new File( configdir, "restriction.json" );
+        rr.readRestrictions( file );
 
-    @Mod.EventHandler
-    public void init( FMLInitializationEvent event ){
-        proxy.init( event );
+        MinecraftForge.EVENT_BUS.register( new RightClickHandler() );
+        MinecraftForge.EVENT_BUS.register( new PlaceHandler() );
     }
 
-    @Mod.EventHandler
-    public void preInit( FMLPreInitializationEvent event ){
-        proxy.preInit( event );
+    @SubscribeEvent
+    public void client(FMLClientSetupEvent event){
+        MinecraftForge.EVENT_BUS.register( new TooltipHandler());
     }
-
 }

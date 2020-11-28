@@ -4,30 +4,32 @@ import com.davqvist.restriction.Restriction;
 import com.davqvist.restriction.config.RestrictionReader;
 import com.davqvist.restriction.utility.RestrictionHelper;
 import com.davqvist.restriction.utility.RestrictionNotifications;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class PlaceHandler{
 
     @SubscribeEvent
-    public void onPlace( BlockEvent.PlaceEvent event ){
-        EntityPlayer player = event.getPlayer();
+    public void onPlace( BlockEvent.EntityPlaceEvent event ){
+        if(!(event.getEntity() instanceof PlayerEntity)) return;
+        PlayerEntity player = (PlayerEntity)event.getEntity();
         BlockPos pos = event.getPos();
-        World world = event.getWorld();
+        IWorld iWorld = event.getWorld();
         String message = "";
-        if( player != null && !player.isCreative() && !player.world.isRemote && !event.isCanceled() && pos != null ){
-            IBlockState state = event.getPlacedBlock();
+        if(!player.isCreative() && !player.world.isRemote && !event.isCanceled() && pos != null ){
+            BlockState state = event.getPlacedBlock();
+            ServerWorld world = (ServerWorld)iWorld;
             if( state != null ){
-                for( RestrictionReader.RestrictionBlock block : Restriction.proxy.rr.root.entries ){
-                    if( ( block.ignoreMeta && Block.isEqualTo( state.getBlock(), Block.getBlockFromName( block.block ) ) || state == Block.getBlockFromName( block.block ).getStateFromMeta( block.meta ) ) ){
+                for( RestrictionReader.RestrictionBlock block : Restriction.rr.root.entries ){
+                    if(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block.block)).equals(state.getBlock())){
                         for( RestrictionReader.RestrictionDesciptor desc : block.restrictions ){
                             if( desc.type == RestrictionReader.RestrictionType.SEESKY ){
                                 if( RestrictionHelper.canSeeSky( pos, world ) == desc.reverse ){
@@ -71,11 +73,11 @@ public class PlaceHandler{
             }
         }
         if( event.isCanceled() ){
-            event.getPlayer().sendStatusMessage( new TextComponentString( message ), true );
+            player.sendStatusMessage( new StringTextComponent( message ), true );
         }
     }
 
-    private void cancelPlace( BlockEvent.PlaceEvent event ){
-        event.setCanceled( true );
-    }
+    //private void cancelPlace( BlockEvent.PlaceEvent event ){
+  //      event.setCanceled( true );
+    //}
 }
