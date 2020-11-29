@@ -85,7 +85,7 @@ public class RestrictionHelper {
         for (int x = -actualRange; x <= actualRange; x++) {
             for (int y = -actualRange; y <= actualRange; y++) {
                 for (int z = -actualRange; z <= actualRange; z++) {
-                    if (block.equals(world.getBlockState(new BlockPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z)).getBlock())) {
+                    if (UtilityHelper.matches(world,desc.block,world.getBlockState(new BlockPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z)).getBlock())) {
                         count++;
                     }
                     if (count >= minAmount) {
