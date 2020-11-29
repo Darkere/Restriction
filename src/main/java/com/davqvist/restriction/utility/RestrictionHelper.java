@@ -1,10 +1,10 @@
 package com.davqvist.restriction.utility;
 
+import com.davqvist.restriction.config.RestrictionReader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -20,7 +20,6 @@ public class RestrictionHelper {
 
     public static enum LAST_IN_ROOM_ERROR_TYPE {CLOSED, SIZE, BLOCKS}
 
-    ;
     public static LAST_IN_ROOM_ERROR_TYPE LAST_IN_ROOM_ERROR;
     public static int LAST_IN_ROOM_ERROR_AMOUNT = 0;
 
@@ -28,14 +27,14 @@ public class RestrictionHelper {
         return world.canBlockSeeSky(pos);
     }
 
-    public static boolean isInRoom(BlockPos pos, World world, int minSize, String blockString, boolean ignoreMeta, int meta, int minAmount) {
-        Stack<BlockPos> stack = new Stack<BlockPos>();
+    public static boolean isInRoom(BlockPos pos, World world, RestrictionReader.RestrictionDescriptor desc) {
+        int minSize = desc.getAmount();
+        int minAmount = desc.block.getCount();
+        Stack<BlockPos> stack = new Stack<>();
         stack.push(pos);
         final int maxSize = 10000;
-        final HashSet<BlockPos> addableBlocks = new HashSet<BlockPos>();
-        final HashSet<BlockPos> foundBlocks = new HashSet<BlockPos>();
-
-        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockString));
+        final HashSet<BlockPos> addableBlocks = new HashSet<>();
+        final HashSet<BlockPos> foundBlocks = new HashSet<>();
 
         while (!stack.isEmpty()) {
             BlockPos stackElement = stack.pop();
@@ -45,16 +44,9 @@ public class RestrictionHelper {
                 BlockState state = world.getBlockState(searchNextPosition);
                 if (!addableBlocks.contains(searchNextPosition)) {
                     if (addableBlocks.size() <= maxSize) {
-                        if (!state.isSolidSide(world, searchNextPosition, direction.getOpposite())
-                                && !state.isSolidSide(world, searchNextPosition, direction)
-                                && state.isSolid()
-                                && !(state.getBlock() instanceof DoorBlock)
-                                && ((DoorBlock) state.getBlock()).isOpen(state)
-                                && state.get(BlockStateProperties.FACING) == direction
-                                || state.get(BlockStateProperties.FACING) == direction.getOpposite()) {
-
+                        if (!isWallBlock(world, searchNextPosition, state, direction)) {
                             stack.push(searchNextPosition);
-                        } else if (block != null && (world.getBlockState(searchNextPosition).getBlock() == block) && !foundBlocks.contains(searchNextPosition)) {
+                        } else if (UtilityHelper.matches(world, desc.block, world.getBlockState(searchNextPosition).getBlock())) {
                             foundBlocks.add(searchNextPosition);
                         }
                     } else {
@@ -75,7 +67,17 @@ public class RestrictionHelper {
         return (addableBlocks.size() >= minSize && foundBlocks.size() >= minAmount);
     }
 
-    public static boolean isNearby(BlockPos pos, World world, int range, String blockString, boolean ignoreMeta, int meta, int minAmount) {
+    private static boolean isWallBlock(World world, BlockPos pos, BlockState state, Direction direction) {
+        if (state.getBlock() instanceof DoorBlock) return true;
+        return state.isSolidSide(world, pos, direction.getOpposite())
+            && state.isSolidSide(world, pos, direction)
+            && state.isSolid();
+    }
+
+    public static boolean isNearby(BlockPos pos, World world, RestrictionReader.RestrictionDescriptor desc) {
+        int range = desc.getAmount();
+        String blockString = desc.block.name;
+        int minAmount = desc.block.getCount();
         Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockString));
         if (block == null) return false;
         int actualRange = Math.min(5, range);
@@ -109,7 +111,7 @@ public class RestrictionHelper {
         return true;
     }
 
-    public static boolean isInDimension(ServerWorld world, String dim) {
-        return world.getDimensionKey().getRegistryName().equals(new ResourceLocation(dim));
+    public static boolean isInDimension(World world, String dim) {
+        return world.getDimensionKey().getLocation().equals(new ResourceLocation(dim));
     }
 }
