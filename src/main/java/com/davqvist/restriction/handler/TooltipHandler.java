@@ -1,6 +1,5 @@
 package com.davqvist.restriction.handler;
 
-import com.davqvist.restriction.Restriction;
 import com.davqvist.restriction.config.RestrictionReader;
 import com.davqvist.restriction.utility.RestrictionNotifications;
 import com.davqvist.restriction.utility.UtilityHelper;
@@ -18,9 +17,11 @@ public class TooltipHandler {
     @SubscribeEvent
     public void onTooltip(ItemTooltipEvent e) {
         if (e.getPlayer() == null) return;
-        for (RestrictionReader.RestrictionSection rblock : Restriction.rr.root.entries) {
-            if (UtilityHelper.matches(e.getPlayer().getEntityWorld(), rblock.block, e.getItemStack().getItem())) {
-                e.getToolTip().addAll(getNotifications(rblock));
+        for (RestrictionReader.RestrictionRoot root : RestrictionReader.roots) {
+            for (RestrictionReader.RestrictionSection rblock : root.entries) {
+                if (UtilityHelper.matches(e.getPlayer().getEntityWorld(), rblock.block, e.getItemStack().getItem())) {
+                    e.getToolTip().addAll(getNotifications(rblock));
+                }
             }
         }
     }

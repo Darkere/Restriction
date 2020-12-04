@@ -14,13 +14,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 
 public class RestrictionReader {
 
-    public RestrictionRoot root;
+    public static List<RestrictionRoot> roots = new ArrayList<>();
 
     @SubscribeEvent
-    public static void reload(AddReloadListenerEvent event){
+    public static void reload(AddReloadListenerEvent event) {
+        roots.clear();
         try {
             Files.list(Restriction.configdir.toPath()).forEach(path -> Restriction.rr.readRestrictions(path.toFile()));
         } catch (IOException e) {
@@ -33,7 +35,9 @@ public class RestrictionReader {
         try {
             Gson gson = new Gson();
             JsonReader reader = new JsonReader(new FileReader(file));
-            root = gson.fromJson(reader, RestrictionRoot.class);
+            RestrictionRoot root = gson.fromJson(reader, RestrictionRoot.class);
+            if (root != null)
+                roots.add(root);
         } catch (Exception e) {
             LogHelper.error("The Restriction json was invalid and is ignored.");
             e.printStackTrace();
@@ -41,7 +45,8 @@ public class RestrictionReader {
     }
 
     public void createTestConfig(File file) {
-        root = new RestrictionRoot();
+        RestrictionRoot root = new RestrictionRoot();
+        roots.add(root);
         RestrictionSection rBlock = new RestrictionSection();
         BlockOrTag block = new BlockOrTag();
         block.name = "minecraft:orange_bed";
@@ -127,13 +132,13 @@ public class RestrictionReader {
         root.entries.add(rBlock);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(root);
+        String json = gson.toJson(roots);
         try {
             FileWriter writer = new FileWriter(file);
             writer.write(json);
             writer.close();
         } catch (IOException e) {
-            LogHelper.error("The default config was invalid and not created.");
+            LogHelper.error("The example config was invalid and not created.");
             e.printStackTrace();
         }
     }
@@ -153,9 +158,11 @@ public class RestrictionReader {
         private Boolean reverse;
         public String dimension;
         public BlockOrTag block;
-        public boolean getReverse(){
+
+        public boolean getReverse() {
             return reverse != null && reverse;
         }
+
         public int getAmount() {
             return amount == null ? 0 : amount;
         }
@@ -169,7 +176,8 @@ public class RestrictionReader {
         public int getCount() {
             return count == null ? 0 : count;
         }
-        public boolean isTag(){
+
+        public boolean isTag() {
             return isTag != null && isTag;
         }
     }
