@@ -35,11 +35,11 @@ public class RestrictionReader {
         try {
             Gson gson = new Gson();
             JsonReader reader = new JsonReader(new FileReader(file));
-            RestrictionRoot root = gson.fromJson(reader, RestrictionRoot.class);
-            if (root != null)
-                roots.add(root);
+            RestrictionOrigin origin = gson.fromJson(reader, RestrictionOrigin.class);
+            if (origin != null)
+                roots.addAll(origin.roots);
         } catch (Exception e) {
-            LogHelper.error("The Restriction json was invalid and is ignored.");
+            LogHelper.error(" The Restriction json was invalid and is ignored.");
             e.printStackTrace();
         }
     }
@@ -49,7 +49,8 @@ public class RestrictionReader {
         roots.add(root);
         RestrictionSection rBlock = new RestrictionSection();
         BlockOrTag block = new BlockOrTag();
-        block.name = "minecraft:orange_bed";
+        block.name = "minecraft (example disabled, use just \"modname\")";
+        block.isMod = true;
 
         RestrictionDescriptor desc = new RestrictionDescriptor();
         desc.type = RestrictionType.SEESKY;
@@ -132,7 +133,7 @@ public class RestrictionReader {
         root.entries.add(rBlock);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(roots);
+        String json = gson.toJson(new RestrictionOrigin(roots));
         try {
             FileWriter writer = new FileWriter(file);
             writer.write(json);
@@ -171,6 +172,7 @@ public class RestrictionReader {
     public class BlockOrTag {
         public String name;
         private Boolean isTag;
+        private Boolean isMod;
         private Integer count;
 
         public int getCount() {
@@ -180,9 +182,20 @@ public class RestrictionReader {
         public boolean isTag() {
             return isTag != null && isTag;
         }
+        public boolean isMod(){
+            return isMod != null && isMod;
+        }
     }
 
     public enum RestrictionType {
         SEESKY, CLOSEDROOM, DIMENSION, NEARBYBLOCKS, EXPERIENCE, MINHEIGHT, ADVANCEMENT
+    }
+
+    private static class RestrictionOrigin {
+        List<RestrictionRoot> roots;
+
+        public RestrictionOrigin(List<RestrictionRoot> roots) {
+            this.roots = roots;
+        }
     }
 }
