@@ -26,34 +26,34 @@ public class RightClickHandler {
                 for (RestrictionReader.RestrictionSection rBlock : root.entries) {
                     if (UtilityHelper.matches(world, rBlock.block, state.getBlock())) {
                         for (RestrictionReader.RestrictionDescriptor desc : rBlock.restrictions) {
-                            if (desc.type == RestrictionReader.RestrictionType.SEESKY) {
-                                if (RestrictionHelper.canSeeSky(pos, world) == desc.getReverse()) {
-                                    cancelRightClick(event, RestrictionNotifications.getNotificationSeeSky(desc.getReverse()));
+                            if (desc.type == RestrictionReader.RestrictionOptions.SEESKY) {
+                                if (RestrictionHelper.canSeeSky(pos, world) == desc.getIsReversed()) {
+                                    cancelRightClick(event, RestrictionNotifications.getNotificationSeeSky(desc.getIsReversed()));
                                 }
                             }
-                            if (desc.type == RestrictionReader.RestrictionType.CLOSEDROOM) {
-                                if (RestrictionHelper.isInRoom(pos, world, desc) == desc.getReverse()) {
+                            if (desc.type == RestrictionReader.RestrictionOptions.CLOSEDROOM) {
+                                if (RestrictionHelper.isInRoom(pos, world, desc) == desc.getIsReversed()) {
                                     cancelRightClick(event, RestrictionNotifications.getNotificationClosedRoom(desc, false));
                                 }
                             }
-                            if (desc.type == RestrictionReader.RestrictionType.DIMENSION) {
-                                if (RestrictionHelper.isInDimension(world, desc.dimension) == desc.getReverse()) {
-                                    cancelRightClick(event, RestrictionNotifications.getNotificationDimension(desc.getReverse(), desc.dimension));
+                            if (desc.type == RestrictionReader.RestrictionOptions.DIMENSION) {
+                                if (RestrictionHelper.isInDimension(world, desc.dimension) == desc.getIsReversed()) {
+                                    cancelRightClick(event, RestrictionNotifications.getNotificationDimension(desc.getIsReversed(), desc.dimension));
                                 }
                             }
-                            if (desc.type == RestrictionReader.RestrictionType.NEARBYBLOCKS) {
-                                if (RestrictionHelper.isNearby(pos, world, desc) == desc.getReverse()) {
+                            if (desc.type == RestrictionReader.RestrictionOptions.NEARBYBLOCKS) {
+                                if (RestrictionHelper.isNearby(pos, world, desc) == desc.getIsReversed()) {
                                     cancelRightClick(event, RestrictionNotifications.getNotificationNearbyBlocks(desc));
                                 }
                             }
-                            if (desc.type == RestrictionReader.RestrictionType.EXPERIENCE) {
-                                if (RestrictionHelper.hasLevels(player, desc.getAmount()) == desc.getReverse()) {
-                                    cancelRightClick(event, RestrictionNotifications.getNotificationExperience(desc.getReverse(), desc.getAmount()));
+                            if (desc.type == RestrictionReader.RestrictionOptions.EXPERIENCE) {
+                                if (RestrictionHelper.hasLevels(player, desc.getAmount()) == desc.getIsReversed()) {
+                                    cancelRightClick(event, RestrictionNotifications.getNotificationExperience(desc.getIsReversed(), desc.getAmount()));
                                 }
                             }
-                            if (desc.type == RestrictionReader.RestrictionType.MINHEIGHT) {
-                                if (RestrictionHelper.hasMinHeight(pos, desc.getAmount()) == desc.getReverse()) {
-                                    cancelRightClick(event, RestrictionNotifications.getNotificationMinHeight(desc.getReverse(), desc.getAmount()));
+                            if (desc.type == RestrictionReader.RestrictionOptions.MINHEIGHT) {
+                                if (RestrictionHelper.hasMinHeight(pos, desc.getAmount()) == desc.getIsReversed()) {
+                                    cancelRightClick(event, RestrictionNotifications.getNotificationMinHeight(desc.getIsReversed(), desc.getAmount()));
                                 }
                             }
                         }

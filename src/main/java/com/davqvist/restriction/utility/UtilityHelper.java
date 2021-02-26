@@ -36,4 +36,7 @@ public class UtilityHelper{
             return candidateBlock.equals(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block.name)));
         }
     }
+    public static String getBlockOrTagName(RestrictionReader.RestrictionDescriptor desc){
+        return desc.block.isTag() ? "Blocks in tag #" + desc.block.name : UtilityHelper.getBlockName( desc.block.name );
+    }
 }

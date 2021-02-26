@@ -32,23 +32,23 @@ public class TooltipHandler {
 
         for (RestrictionReader.RestrictionDescriptor desc : rblock.restrictions) {
             String notification = null;
-            if (desc.type == RestrictionReader.RestrictionType.SEESKY) {
-                notification = RestrictionNotifications.getNotificationSeeSky(desc.getReverse());
+            if (desc.type == RestrictionReader.RestrictionOptions.SEESKY) {
+                notification = RestrictionNotifications.getNotificationSeeSky(desc.getIsReversed());
             }
-            if (desc.type == RestrictionReader.RestrictionType.CLOSEDROOM) {
+            if (desc.type == RestrictionReader.RestrictionOptions.CLOSEDROOM) {
                 notification = RestrictionNotifications.getNotificationClosedRoom(desc, true);
             }
-            if (desc.type == RestrictionReader.RestrictionType.DIMENSION) {
-                notification = RestrictionNotifications.getNotificationDimension(desc.getReverse(), desc.dimension);
+            if (desc.type == RestrictionReader.RestrictionOptions.DIMENSION) {
+                notification = RestrictionNotifications.getNotificationDimension(desc.getIsReversed(), desc.dimension);
             }
-            if (desc.type == RestrictionReader.RestrictionType.NEARBYBLOCKS) {
+            if (desc.type == RestrictionReader.RestrictionOptions.NEARBYBLOCKS) {
                 notification = RestrictionNotifications.getNotificationNearbyBlocks(desc);
             }
-            if (desc.type == RestrictionReader.RestrictionType.EXPERIENCE) {
-                notification = RestrictionNotifications.getNotificationExperience(desc.getReverse(), desc.getAmount());
+            if (desc.type == RestrictionReader.RestrictionOptions.EXPERIENCE) {
+                notification = RestrictionNotifications.getNotificationExperience(desc.getIsReversed(), desc.getAmount());
             }
-            if (desc.type == RestrictionReader.RestrictionType.MINHEIGHT) {
-                notification = RestrictionNotifications.getNotificationMinHeight(desc.getReverse(), desc.getAmount());
+            if (desc.type == RestrictionReader.RestrictionOptions.MINHEIGHT) {
+                notification = RestrictionNotifications.getNotificationMinHeight(desc.getIsReversed(), desc.getAmount());
             }
             if (notification != null) {
                 notifications.add(new StringTextComponent("Restriction: ").mergeStyle(TextFormatting.RED).append(new StringTextComponent(notification).mergeStyle(TextFormatting.WHITE)));
