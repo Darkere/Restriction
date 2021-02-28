@@ -23,10 +23,6 @@ public class RestrictionHelper {
     public static LAST_IN_ROOM_ERROR_TYPE LAST_IN_ROOM_ERROR;
     public static int LAST_IN_ROOM_ERROR_AMOUNT = 0;
 
-    public static boolean canSeeSky(BlockPos pos, IWorld world) {
-        return world.canBlockSeeSky(pos);
-    }
-
     public static boolean isInRoom(BlockPos pos, World world, RestrictionReader.RestrictionDescriptor desc) {
         int minSize = desc.getAmount();
         int minAmount = desc.block.getCount();
@@ -72,46 +68,5 @@ public class RestrictionHelper {
         return state.isSolidSide(world, pos, direction.getOpposite())
             && state.isSolidSide(world, pos, direction)
             && state.isSolid();
-    }
-
-    public static boolean isNearby(BlockPos pos, World world, RestrictionReader.RestrictionDescriptor desc) {
-        int range = desc.getAmount();
-        String blockString = desc.block.name;
-        int minAmount = desc.block.getCount();
-        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockString));
-        if (block == null) return false;
-        int actualRange = Math.min(5, range);
-        int count = 0;
-        for (int x = -actualRange; x <= actualRange; x++) {
-            for (int y = -actualRange; y <= actualRange; y++) {
-                for (int z = -actualRange; z <= actualRange; z++) {
-                    if (UtilityHelper.matches(world,desc.block,world.getBlockState(new BlockPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z)).getBlock())) {
-                        count++;
-                    }
-                    if (count >= minAmount) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public static boolean hasLevels(PlayerEntity player, int minAmount) {
-        if (minAmount > 0) {
-            return (player != null && player.experienceLevel >= minAmount);
-        }
-        return true;
-    }
-
-    public static boolean hasMinHeight(BlockPos pos, int minAmount) {
-        if (minAmount >= 0) {
-            return (pos.getY() >= minAmount);
-        }
-        return true;
-    }
-
-    public static boolean isInDimension(World world, String dim) {
-        return world.getDimensionKey().getLocation().equals(new ResourceLocation(dim));
     }
 }

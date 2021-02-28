@@ -7,14 +7,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-
-public class SeeSkyRestriction implements RestrictionType {
-    private static final ResourceLocation ID = new ResourceLocation(Reference.MOD_ID, "seesky");
-    RestrictionReader.RestrictionDescriptor descriptor;
-
+public class LevelRestriction implements RestrictionType{
+    public static final ResourceLocation ID = new ResourceLocation(Reference.MOD_ID,"level");
     @Override
     public boolean test(World world, BlockPos pos, RestrictionReader.RestrictionDescriptor descriptor, PlayerEntity player) {
-        return world.canSeeSky(pos) != descriptor.getIsReversed();
+        if (descriptor.getAmount() >= 0) {
+            return (pos.getY() >= descriptor.getAmount());
+        }
+        return true;
     }
 
     @Override
@@ -24,7 +24,6 @@ public class SeeSkyRestriction implements RestrictionType {
 
     @Override
     public String getTooltip() {
-        return "Block must " + ( descriptor.getIsReversed() ? "not " : "" ) + "see the sky.";
+        return "You must " + ( descriptor.getIsReversed() ? "not " : "" ) + "have at least " + descriptor.getAmount() + " levels of experience.";
     }
-
 }

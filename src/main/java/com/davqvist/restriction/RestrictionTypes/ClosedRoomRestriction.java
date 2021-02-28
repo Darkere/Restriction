@@ -4,6 +4,7 @@ import com.davqvist.restriction.config.RestrictionReader;
 import com.davqvist.restriction.reference.Reference;
 import com.davqvist.restriction.utility.RestrictionHelper;
 import com.davqvist.restriction.utility.UtilityHelper;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -14,8 +15,8 @@ public class ClosedRoomRestriction implements RestrictionType {
 
 
     @Override
-    public boolean test(World world, BlockPos pos, RestrictionReader.RestrictionDescriptor descriptor) {
-        return world.canSeeSky(pos) != descriptor.getIsReversed();
+    public boolean test(World world, BlockPos pos, RestrictionReader.RestrictionDescriptor descriptor, PlayerEntity player) {
+
     }
 
     @Override
