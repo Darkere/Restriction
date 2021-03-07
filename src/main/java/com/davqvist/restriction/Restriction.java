@@ -43,4 +43,16 @@ public class Restriction {
     public void client(FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.register(new TooltipHandler());
     }
+
+    public enum Applicator {
+        TAG, NAME, MOD
+    }
+
+    public enum Action {
+        PLACEMENT, USE
+    }
+
+    public enum Type {
+        SEESKY, CLOSEDROOM, DIMENSION, NEARBYBLOCKS, EXPERIENCE, MINHEIGHT, ADVANCEMENT
+    }
 }

@@ -23,7 +23,7 @@ public class SeeSkyRestriction implements RestrictionType {
     }
 
     @Override
-    public String getTooltip() {
+    public String getMessage() {
         return "Block must " + ( descriptor.getIsReversed() ? "not " : "" ) + "see the sky.";
     }
 

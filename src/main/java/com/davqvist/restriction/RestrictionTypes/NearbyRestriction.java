@@ -44,7 +44,7 @@ public class NearbyRestriction implements RestrictionType{
     }
 
     @Override
-    public String getTooltip() {
+    public String getMessage() {
         boolean reverse = descriptor.getIsReversed();
         int size = descriptor.getAmount();
         int amount = descriptor.block.getCount();

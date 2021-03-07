@@ -1,5 +1,6 @@
 package com.davqvist.restriction.handler;
 
+import com.davqvist.restriction.Restriction;
 import com.davqvist.restriction.config.RestrictionReader;
 import com.davqvist.restriction.utility.RestrictionNotifications;
 import com.davqvist.restriction.utility.UtilityHelper;
@@ -32,22 +33,22 @@ public class TooltipHandler {
 
         for (RestrictionReader.RestrictionDescriptor desc : rblock.restrictions) {
             String notification = null;
-            if (desc.type == RestrictionReader.RestrictionOptions.SEESKY) {
+            if (desc.type == Restriction.Type.SEESKY) {
                 notification = RestrictionNotifications.getNotificationSeeSky(desc.getIsReversed());
             }
-            if (desc.type == RestrictionReader.RestrictionOptions.CLOSEDROOM) {
+            if (desc.type == Restriction.Type.CLOSEDROOM) {
                 notification = RestrictionNotifications.getNotificationClosedRoom(desc, true);
             }
-            if (desc.type == RestrictionReader.RestrictionOptions.DIMENSION) {
+            if (desc.type == Restriction.Type.DIMENSION) {
                 notification = RestrictionNotifications.getNotificationDimension(desc.getIsReversed(), desc.dimension);
             }
-            if (desc.type == RestrictionReader.RestrictionOptions.NEARBYBLOCKS) {
+            if (desc.type == Restriction.Type.NEARBYBLOCKS) {
                 notification = RestrictionNotifications.getNotificationNearbyBlocks(desc);
             }
-            if (desc.type == RestrictionReader.RestrictionOptions.EXPERIENCE) {
+            if (desc.type == Restriction.Type.EXPERIENCE) {
                 notification = RestrictionNotifications.getNotificationExperience(desc.getIsReversed(), desc.getAmount());
             }
-            if (desc.type == RestrictionReader.RestrictionOptions.MINHEIGHT) {
+            if (desc.type == Restriction.Type.MINHEIGHT) {
                 notification = RestrictionNotifications.getNotificationMinHeight(desc.getIsReversed(), desc.getAmount());
             }
             if (notification != null) {

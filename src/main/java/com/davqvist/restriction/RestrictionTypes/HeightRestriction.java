@@ -25,7 +25,7 @@ public class HeightRestriction implements RestrictionType {
     }
 
     @Override
-    public String getTooltip() {
+    public String getMessage() {
         return "Block must be at a " + (descriptor.getIsReversed() ? "maximum" : "minimum") + " height of " + descriptor.getAmount();
     }
 }

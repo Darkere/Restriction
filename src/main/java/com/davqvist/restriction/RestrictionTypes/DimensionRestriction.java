@@ -20,7 +20,7 @@ public class DimensionRestriction implements RestrictionType{
     }
 
     @Override
-    public String getTooltip() {
+    public String getMessage() {
         return "Block must " + ( descriptor.getIsReversed() ? "not " : "" ) + "be in dimension " + descriptor.dimension;
     }
 

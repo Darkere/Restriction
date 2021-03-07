@@ -1,7 +1,6 @@
 package com.davqvist.restriction.config;
 
 import com.davqvist.restriction.Restriction;
-import com.davqvist.restriction.RestrictionTypes.RestrictionType;
 import com.davqvist.restriction.utility.LogHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -55,7 +54,7 @@ public class RestrictionReader {
         block.isMod = true;
 
         RestrictionDescriptor desc = new RestrictionDescriptor();
-        desc.type = RestrictionOptions.SEESKY;
+        desc.type = Restriction.Type.SEESKY;
         desc.reverse = true;
         rBlock.restrictions.add(desc);
         rBlock.block = block;
@@ -68,7 +67,7 @@ public class RestrictionReader {
         rBlock.block = block;
 
         desc = new RestrictionDescriptor();
-        desc.type = RestrictionOptions.CLOSEDROOM;
+        desc.type = Restriction.Type.CLOSEDROOM;
         desc.amount = 50;
         block = new BlockOrTag();
         block.name = "minecraft:planks";
@@ -85,7 +84,7 @@ public class RestrictionReader {
         rBlock.block = block;
 
         desc = new RestrictionDescriptor();
-        desc.type = RestrictionOptions.DIMENSION;
+        desc.type = Restriction.Type.DIMENSION;
         desc.dimension = "minecraft:the_nether";
         rBlock.restrictions.add(desc);
 
@@ -98,7 +97,7 @@ public class RestrictionReader {
 
         desc = new RestrictionDescriptor();
         desc.amount = 3;
-        desc.type = RestrictionOptions.NEARBYBLOCKS;
+        desc.type = Restriction.Type.NEARBYBLOCKS;
 
 
         block = new BlockOrTag();
@@ -115,7 +114,7 @@ public class RestrictionReader {
         rBlock.block = block;
 
         desc = new RestrictionDescriptor();
-        desc.type = RestrictionOptions.EXPERIENCE;
+        desc.type = Restriction.Type.EXPERIENCE;
         desc.amount = 20;
         rBlock.restrictions.add(desc);
 
@@ -127,7 +126,7 @@ public class RestrictionReader {
         rBlock.block = block;
 
         desc = new RestrictionDescriptor();
-        desc.type = RestrictionOptions.MINHEIGHT;
+        desc.type = Restriction.Type.MINHEIGHT;
         desc.amount = 16;
         desc.reverse = true;
         rBlock.restrictions.add(desc);
@@ -156,49 +155,29 @@ public class RestrictionReader {
     }
 
     public class RestrictionDescriptor {
-        public RestrictionOptions type;
+        public Restriction.Type type;
         private Integer amount;
         private Boolean reverse;
         public String dimension;
-        public BlockOrTag block;
-
+        public String mod;
+        public String name;
+        public String tag;
         public boolean getIsReversed() {
             return reverse != null && reverse;
         }
 
         public int getAmount() {
-            return amount == null ? 0 : amount;
+            return amount == null ? 1 : amount;
+        }
+
+        public Restriction.Applicator getApplicator(){
+            if(mod != null) return Restriction.Applicator.MOD;
+            if(tag != null) return Restriction.Applicator.TAG;
+            if(name != null) return Restriction.Applicator.NAME;
+            return null;
         }
     }
 
-    public class BlockOrTag {
-        public String name;
-        private Boolean isTag;
-        private Boolean isMod;
-        private Integer count;
-
-        public int getCount() {
-            return count == null ? 0 : count;
-        }
-
-        public boolean isTag() {
-            return isTag != null && isTag;
-        }
-
-        public boolean isMod() {
-            return isMod != null && isMod;
-        }
-
-        public RestrictionType.RestrictingType getRestrictingType() {
-            if (isMod()) return RestrictionType.RestrictingType.MOD;
-            if (isTag()) return RestrictionType.RestrictingType.TAG;
-            return RestrictionType.RestrictingType.BLOCK;
-        }
-    }
-
-    public enum RestrictionOptions {
-        SEESKY, CLOSEDROOM, DIMENSION, NEARBYBLOCKS, EXPERIENCE, MINHEIGHT, ADVANCEMENT
-    }
 
     private static class RestrictionOrigin {
         List<RestrictionRoot> roots;

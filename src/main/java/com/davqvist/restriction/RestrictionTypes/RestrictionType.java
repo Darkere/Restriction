@@ -1,5 +1,6 @@
 package com.davqvist.restriction.RestrictionTypes;
 
+import com.davqvist.restriction.Restriction;
 import com.davqvist.restriction.config.RestrictionReader;
 import com.davqvist.restriction.reference.Reference;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,16 +21,13 @@ public interface RestrictionType {
         return MISSING_ID;
     }
 
-    default String getTooltip() {
+    default String getMessage() {
         return missingTooltip;
     }
-    default RestrictingType getRestrictingType(){
+    default Restriction.Applicator getRestrictingType(){
         return descriptor.block.getRestrictingType();
     };
 
-    public enum RestrictingType{
-        TAG,BLOCK,MOD
-    }
 }
 
 

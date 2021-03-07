@@ -25,7 +25,7 @@ public class ClosedRoomRestriction implements RestrictionType {
     }
 
     @Override
-    public String getTooltip() {
+    public String getMessage() {
         boolean reverse = descriptor.getIsReversed();
         int size = descriptor.getAmount();
         String blockString =  descriptor.block.name;

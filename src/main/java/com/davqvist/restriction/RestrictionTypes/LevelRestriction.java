@@ -23,7 +23,7 @@ public class LevelRestriction implements RestrictionType{
     }
 
     @Override
-    public String getTooltip() {
+    public String getMessage() {
         return "You must " + ( descriptor.getIsReversed() ? "not " : "" ) + "have at least " + descriptor.getAmount() + " levels of experience.";
     }
 }

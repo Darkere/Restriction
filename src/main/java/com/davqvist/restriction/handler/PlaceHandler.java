@@ -1,5 +1,6 @@
 package com.davqvist.restriction.handler;
 
+import com.davqvist.restriction.Restriction;
 import com.davqvist.restriction.config.RestrictionReader;
 import com.davqvist.restriction.utility.RestrictionHelper;
 import com.davqvist.restriction.utility.RestrictionNotifications;
@@ -32,37 +33,37 @@ public class PlaceHandler {
                     for (RestrictionReader.RestrictionSection block : root.entries) {
                         if (UtilityHelper.matches(world, block.block, state.getBlock())) {
                             for (RestrictionReader.RestrictionDescriptor desc : block.restrictions) {
-                                if (desc.type == RestrictionReader.RestrictionOptions.SEESKY) {
+                                if (desc.type == Restriction.Type.SEESKY) {
                                     if (RestrictionHelper.canSeeSky(pos, world) == desc.getIsReversed()) {
                                         event.setCanceled(true);
                                         message = RestrictionNotifications.getNotificationSeeSky(desc.getIsReversed());
                                     }
                                 }
-                                if (desc.type == RestrictionReader.RestrictionOptions.CLOSEDROOM) {
+                                if (desc.type == Restriction.Type.CLOSEDROOM) {
                                     if (RestrictionHelper.isInRoom(pos, world, desc)) {
                                         event.setCanceled(true);
                                         message = RestrictionNotifications.getNotificationClosedRoom(desc, false);
                                     }
                                 }
-                                if (desc.type == RestrictionReader.RestrictionOptions.DIMENSION) {
+                                if (desc.type == Restriction.Type.DIMENSION) {
                                     if (RestrictionHelper.isInDimension(world, desc.dimension) == desc.getIsReversed()) {
                                         event.setCanceled(true);
                                         message = RestrictionNotifications.getNotificationDimension(desc.getIsReversed(), desc.dimension);
                                     }
                                 }
-                                if (desc.type == RestrictionReader.RestrictionOptions.NEARBYBLOCKS) {
+                                if (desc.type == Restriction.Type.NEARBYBLOCKS) {
                                     if (RestrictionHelper.isNearby(pos, world, desc)) {
                                         event.setCanceled(true);
                                         message = RestrictionNotifications.getNotificationNearbyBlocks(desc);
                                     }
                                 }
-                                if (desc.type == RestrictionReader.RestrictionOptions.EXPERIENCE) {
+                                if (desc.type == Restriction.Type.EXPERIENCE) {
                                     if (RestrictionHelper.hasLevels(player, desc.getAmount()) == desc.getIsReversed()) {
                                         event.setCanceled(true);
                                         message = RestrictionNotifications.getNotificationExperience(desc.getIsReversed(), desc.getAmount());
                                     }
                                 }
-                                if (desc.type == RestrictionReader.RestrictionOptions.MINHEIGHT) {
+                                if (desc.type == Restriction.Type.MINHEIGHT) {
                                     if (RestrictionHelper.hasMinHeight(pos, desc.getAmount()) == desc.getIsReversed()) {
                                         event.setCanceled(true);
                                         message = RestrictionNotifications.getNotificationMinHeight(desc.getIsReversed(), desc.getAmount());
