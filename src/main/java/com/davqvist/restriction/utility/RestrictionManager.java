@@ -2,20 +2,92 @@ package com.davqvist.restriction.utility;
 
 import com.davqvist.restriction.Restriction;
 import com.davqvist.restriction.RestrictionTypes.RestrictionType;
-import com.davqvist.restriction.config.RestrictionReader;
+import com.davqvist.restriction.RestrictionReader;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.MultimapBuilder;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class RestrictionManager {
     public static final RestrictionManager INSTANCE = new RestrictionManager();
-    //TODO mod restictions?
-    //TODO as Datapack???
-    private final Map<ResourceLocation, RestrictionType> USEMAP = new HashMap<>();
-    private final Map<ResourceLocation, RestrictionType> PLACEMAP = new HashMap<>();
+    private final Map<Restriction.Applicator, ListMultimap<String, RestrictionType>> itemRestrictions = new HashMap<>();
+    private final Map<Restriction.Applicator, ListMultimap<String, RestrictionType>> blockRestrictions = new HashMap<>();
+    private final Map<ResourceLocation, Function<RestrictionReader.Descriptor, RestrictionType>> RestrictionRegistry = new HashMap<>();
+    private final Map<Restriction.Applicator,Function<ResourceLocation,String>> RSTransformer = new HashMap<>();
 
-    public void addRestriction(RestrictionReader.RestrictionDescriptor descriptor) {
+    @SuppressWarnings("UnstableApiUsage")
+    public RestrictionManager() {
+        itemRestrictions.put(Restriction.Applicator.MOD, MultimapBuilder.hashKeys().arrayListValues().build());
+        itemRestrictions.put(Restriction.Applicator.NAME, MultimapBuilder.hashKeys().arrayListValues().build());
+        itemRestrictions.put(Restriction.Applicator.TAG, MultimapBuilder.hashKeys().arrayListValues().build());
+        blockRestrictions.put(Restriction.Applicator.MOD, MultimapBuilder.hashKeys().arrayListValues().build());
+        blockRestrictions.put(Restriction.Applicator.NAME, MultimapBuilder.hashKeys().arrayListValues().build());
+        blockRestrictions.put(Restriction.Applicator.TAG, MultimapBuilder.hashKeys().arrayListValues().build());
+        RSTransformer.put(Restriction.Applicator.MOD, ResourceLocation::getNamespace);
+        RSTransformer.put(Restriction.Applicator.TAG, ResourceLocation::toString);
+        RSTransformer.put(Restriction.Applicator.NAME, ResourceLocation::toString);
 
+    }
+
+    public void addRestriction(RestrictionReader.Descriptor descriptor) {
+        if (descriptor.isBlockRestriction())
+            blockRestrictions.get(descriptor.getApplicator()).put(descriptor.getApplicatorString(), RestrictionRegistry.get(new ResourceLocation(descriptor.type)).apply(descriptor));
+        if (descriptor.isItemRestriction())
+            itemRestrictions.get(descriptor.getApplicator()).put(descriptor.getApplicatorString(), RestrictionRegistry.get(new ResourceLocation(descriptor.type)).apply(descriptor));
+    }
+
+    public void registerRestrictionType(ResourceLocation ID, Function<RestrictionReader.Descriptor, RestrictionType> Translator) {
+        RestrictionRegistry.put(ID, Translator);
+    }
+
+    public boolean testItemRestriction(World world, BlockPos pos, PlayerEntity player, ResourceLocation name) {
+        return testRestriction(world,pos,player,name,true);
+    }
+
+    public boolean testBlockRestriction(World world, BlockPos pos, PlayerEntity player, ResourceLocation name) {
+        return testRestriction(world,pos,player,name,false);
+    }
+
+
+    public List<ITextComponent> getMessages(ResourceLocation name) {
+        List<ITextComponent> text = new ArrayList<>();
+        for (Map.Entry<Restriction.Applicator, ListMultimap<String, RestrictionType>> entry : itemRestrictions.entrySet()) {
+            for (RestrictionType restriction : entry.getValue().get(RSTransformer.get(entry.getKey()).apply(name))) {
+                text.add(new StringTextComponent(restriction.getMessage()));
+            }
+        }
+
+        for (Map.Entry<Restriction.Applicator, ListMultimap<String, RestrictionType>> entry : blockRestrictions.entrySet()) {
+            for (RestrictionType restriction : entry.getValue().get(RSTransformer.get(entry.getKey()).apply(name))) {
+                text.add(new StringTextComponent(restriction.getMessage()));
+            }
+        }
+        return text;
+    }
+
+    private boolean testRestriction(World world, BlockPos pos, PlayerEntity player,ResourceLocation name, boolean item) {
+        Map<Restriction.Applicator, ListMultimap<String, RestrictionType>> map = item ? itemRestrictions : blockRestrictions;
+        boolean result = false;
+        for (Map.Entry<Restriction.Applicator, ListMultimap<String, RestrictionType>> entry : map.entrySet()) {
+            for (RestrictionType restriction : entry.getValue().get(RSTransformer.get(entry.getKey()).apply(name))) {
+                result = restriction.test(world, pos, player);
+                if (result){
+                    player.sendStatusMessage(new StringTextComponent(restriction.getMessage()),false);
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 }

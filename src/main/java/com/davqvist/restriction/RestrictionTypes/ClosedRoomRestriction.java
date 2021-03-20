@@ -1,22 +1,77 @@
 package com.davqvist.restriction.RestrictionTypes;
 
-import com.davqvist.restriction.config.RestrictionReader;
-import com.davqvist.restriction.reference.Reference;
-import com.davqvist.restriction.utility.RestrictionHelper;
-import com.davqvist.restriction.utility.UtilityHelper;
+import com.davqvist.restriction.Restriction;
+import com.davqvist.restriction.RestrictionReader;
+import com.davqvist.restriction.utility.MatchHelper;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.DoorBlock;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
+import java.util.HashSet;
+import java.util.Stack;
 
-public class ClosedRoomRestriction implements RestrictionType {
-    private static final ResourceLocation ID = new ResourceLocation(Reference.MOD_ID, "closedroom");
+import static com.davqvist.restriction.utility.MessageHelper.*;
+
+public class ClosedRoomRestriction extends RestrictionType {
+    public static final ResourceLocation ID = new ResourceLocation(Restriction.MOD_ID, "closedroom");
+
+    public ClosedRoomRestriction(RestrictionReader.Descriptor descriptor) {
+        super(descriptor);
+    }
 
 
     @Override
-    public boolean test(World world, BlockPos pos, RestrictionReader.RestrictionDescriptor descriptor, PlayerEntity player) {
+    public boolean test(World world, BlockPos pos, PlayerEntity player) {
+        int minSize = descriptor.getAmount();
+        int minAmount = descriptor.getAmount();
+        Stack<BlockPos> stack = new Stack<>();
+        stack.push(pos);
+        final int maxSize = 10000;
+        final HashSet<BlockPos> addableBlocks = new HashSet<>();
+        final HashSet<BlockPos> foundBlocks = new HashSet<>();
 
+        while (!stack.isEmpty()) {
+            BlockPos stackElement = stack.pop();
+            addableBlocks.add(stackElement);
+            for (Direction direction : Direction.values()) {
+                BlockPos searchNextPosition = stackElement.offset(direction);
+                BlockState state = world.getBlockState(searchNextPosition);
+                if (!addableBlocks.contains(searchNextPosition)) {
+                    if (addableBlocks.size() <= maxSize) {
+                        if (!isWallBlock(world, searchNextPosition, state, direction)) {
+                            stack.push(searchNextPosition);
+                        } else if (MatchHelper.matches(world, descriptor, world.getBlockState(searchNextPosition).getBlock())) {
+                            foundBlocks.add(searchNextPosition);
+                        }
+                    } else {
+                        player.sendStatusMessage(new StringTextComponent("Block must be placed in a closed room!"), true);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        if (foundBlocks.size() < minAmount) {
+            player.sendStatusMessage(new StringTextComponent("Room must be " + (minAmount - foundBlocks.size()) + " blocks bigger"), true);
+        }
+
+        if (addableBlocks.size() < minSize) {
+            player.sendStatusMessage(new StringTextComponent("Room must be " + (minSize - addableBlocks.size()) + " blocks smaller"), true);
+        }
+
+        return (addableBlocks.size() >= minSize && foundBlocks.size() >= minAmount);
+    }
+
+    private static boolean isWallBlock(World world, BlockPos pos, BlockState state, Direction direction) {
+        if (state.getBlock() instanceof DoorBlock) return true;
+        return state.isSolidSide(world, pos, direction.getOpposite())
+                && state.isSolidSide(world, pos, direction)
+                && state.isSolid();
     }
 
     @Override
@@ -26,16 +81,6 @@ public class ClosedRoomRestriction implements RestrictionType {
 
     @Override
     public String getMessage() {
-        boolean reverse = descriptor.getIsReversed();
-        int size = descriptor.getAmount();
-        String blockString =  descriptor.block.name;
-        int amount = descriptor.block.getCount();
-        String blockname = UtilityHelper.getBlockOrTagName(descriptor);
-        switch( RestrictionHelper.LAST_IN_ROOM_ERROR ){
-            case CLOSED: return "Block must " + ( reverse ? "not " : "" ) + "be in closed room.";
-            case SIZE: return "Room is not big enough. Missing " + RestrictionHelper.LAST_IN_ROOM_ERROR_AMOUNT + " blocks.";
-            case BLOCKS: if( blockString != null && amount > 0 ){ return "Room is missing " + RestrictionHelper.LAST_IN_ROOM_ERROR_AMOUNT + " exposed " + blockname  + "."; }
-        }
-        return "Block must " + ( reverse ? "not " : "" ) + "be in closed room" + ( size > 0 ? " of at least " + size + " blocks in interior size" : "" ) + ( amount > 0  ? ( " and at least " + amount + " exposed " + blockname + "" ) : "" ) + ".";
+        return getBlockItem(descriptor) + " must " + getNot(descriptor) + " be in closed room with a space of at least " + descriptor.getAmount() + " blocks" + ( descriptor.getExposed() > 0  ? ( " and at least " + descriptor.getExposed() + " exposed " + descriptor.name2 + "" ) : "" ) + ".";
     }
 }
