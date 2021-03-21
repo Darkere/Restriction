@@ -1,6 +1,5 @@
 package com.davqvist.restriction;
 
-import com.davqvist.restriction.utility.RestrictionManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -18,7 +17,7 @@ public class EventHandler {
     @SubscribeEvent
     public void onTooltip(ItemTooltipEvent e) {
         if (e.getPlayer() == null) return;
-        RestrictionManager.INSTANCE.getMessages(e.getItemStack().getItem().getRegistryName()).forEach(txt -> e.getToolTip().add(txt));
+        RestrictionManager.INSTANCE.getMessages(e.getItemStack().getItem()).forEach(txt -> e.getToolTip().add(txt));
     }
 
     @SubscribeEvent //this event is only called serverside in 1.16
@@ -51,12 +50,14 @@ public class EventHandler {
 
     @SubscribeEvent
     public void onRightClick(PlayerInteractEvent.RightClickBlock event) {
-        PlayerEntity player = event.getPlayer();
         if (event.getWorld().isRemote) return;
+        ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
         World world = event.getWorld();
         if (player != null && !player.isCreative() && !event.isCanceled()) {
             if (RestrictionManager.INSTANCE.testItemRestriction(world, event.getPos(), player, event.getItemStack().getItem().getRegistryName())) {
                 event.setCanceled(true);
+                ItemStack stack = player.getHeldItemMainhand();
+                player.sendSlotContents(player.container, player.inventory.currentItem + 36, stack);
             }
         }
     }

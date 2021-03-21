@@ -15,7 +15,7 @@ public class MatchHelper {
         switch (descriptor.getApplicator())
         {
             case MOD:
-                result = descriptor.mod.equals(candidate.getRegistryName().getNamespace()) != descriptor.IsReversed();
+                result = descriptor.mod.equals(candidate.getRegistryName().getNamespace());
                 break;
             case TAG:
                 ITag<Block> tag = world.getTags().getBlockTags().get(new ResourceLocation(descriptor.tag));
@@ -25,7 +25,7 @@ public class MatchHelper {
                 result =  ForgeRegistries.BLOCKS.getValue(new ResourceLocation(descriptor.name)) == candidate;
                 break;
         }
-        return  result != descriptor.IsReversed();
+        return  result == descriptor.isReversed();
     }
 
     public static boolean matches(World world, RestrictionReader.Descriptor descriptor, Item candidate){
@@ -33,7 +33,7 @@ public class MatchHelper {
         switch (descriptor.getApplicator())
         {
             case MOD:
-                result = descriptor.mod.equals(candidate.getRegistryName().getNamespace()) != descriptor.IsReversed();
+                result = descriptor.mod.equals(candidate.getRegistryName().getNamespace());
                 break;
             case TAG:
                 ITag<Item> tag = world.getTags().getItemTags().get(new ResourceLocation(descriptor.tag));
@@ -43,6 +43,6 @@ public class MatchHelper {
                 result =   ForgeRegistries.ITEMS.getValue(new ResourceLocation(descriptor.name)) == candidate;
                 break;
         }
-        return  result != descriptor.IsReversed();
+        return  result == descriptor.isReversed();
     }
 }

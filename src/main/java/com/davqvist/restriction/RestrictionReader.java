@@ -1,10 +1,10 @@
 package com.davqvist.restriction;
 
-import com.davqvist.restriction.Restriction;
-import com.davqvist.restriction.utility.RestrictionManager;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import net.minecraft.client.resources.JsonReloadListener;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
@@ -12,148 +12,72 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class RestrictionReader {
 
-
     @SubscribeEvent
     public static void addReloadListener(AddReloadListenerEvent event) {
-       event.addListener(new ReloadListener(new Gson(),"restriction"));
+       event.addListener(new ReloadListener(new Gson(),"restrictions"));
     }
 
     public static List<Descriptor> readRestrictions(JsonElement js, Gson gson) {
-        List<Descriptor> descriptors = new ArrayList<>();
-        RestrictionOrigin origin = null;
+        List<Descriptor> root = null;
         try {
-            origin = gson.fromJson(js, RestrictionOrigin.class);
+            root = gson.fromJson(js, new TypeToken<List<Descriptor>>(){}.getType());
 
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
-        if(origin == null )return descriptors;
-        for (Root root : origin.roots) {
-            for (Section entry : root.entries) {
-                descriptors.addAll(entry.restrictions);
-            }
+        if(root == null )return Collections.emptyList();
+        return root;
+    }
+
+    public void createTestConfig(File file) {
+        List<Descriptor> restrictions = new ArrayList<>();
+        Descriptor desc = new Descriptor();
+        restrictions.add(desc);
+        desc.type = "seesky";
+        desc.reverse = true;
+        desc.block = true;
+        desc.mod = "minecraft";
+
+
+        desc = new Descriptor();
+        desc.name = "minecraft:stone";
+        desc.block = true;
+        desc.type = "level";
+        desc.amount = 10;
+        restrictions.add(desc);
+
+        desc = new Descriptor();
+        desc.name = "minecraft:bread";
+        desc.item = true;
+        desc.type = "dimension";
+        desc.dimension = "minecraft:overworld";
+        desc.reverse = true;
+        restrictions.add(desc);
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(restrictions);
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write(json);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return descriptors;
-    }
-
-//    public void createTestConfig(File file) {
-//        Root root = new Root();
-//        roots.add(root);
-//        Section rBlock = new Section();
-//        BlockOrTag block = new BlockOrTag();
-//        block.name = "minecraft (example disabled, use just \"modname\")";
-//        block.isMod = true;
-//
-//        Descriptor desc = new Descriptor();
-//        desc.type = Restriction.Type.SEESKY;
-//        desc.reverse = true;
-//        rBlock.restrictions.add(desc);
-//        rBlock.block = block;
-//
-//        root.entries.add(rBlock);
-//
-//        rBlock = new Section();
-//        block = new BlockOrTag();
-//        block.name = "minecraft:furnace";
-//        rBlock.block = block;
-//
-//        desc = new Descriptor();
-//        desc.type = Restriction.Type.CLOSEDROOM;
-//        desc.amount = 50;
-//        block = new BlockOrTag();
-//        block.name = "minecraft:planks";
-//        block.count = 40;
-//        block.isTag = true;
-//        desc.block = block;
-//        rBlock.restrictions.add(desc);
-//
-//        root.entries.add(rBlock);
-//
-//        rBlock = new Section();
-//        block = new BlockOrTag();
-//        block.name = "minecraft:brewing_stand";
-//        rBlock.block = block;
-//
-//        desc = new Descriptor();
-//        desc.type = Restriction.Type.DIMENSION;
-//        desc.dimension = "minecraft:the_nether";
-//        rBlock.restrictions.add(desc);
-//
-//        root.entries.add(rBlock);
-//
-//        rBlock = new Section();
-//        block = new BlockOrTag();
-//        block.name = "minecraft:enchanting_table";
-//        rBlock.block = block;
-//
-//        desc = new Descriptor();
-//        desc.amount = 3;
-//        desc.type = Restriction.Type.NEARBYBLOCKS;
-//
-//
-//        block = new BlockOrTag();
-//        block.name = "minecraft:lapis_block";
-//        block.count = 4;
-//        desc.block = block;
-//        rBlock.restrictions.add(desc);
-//
-//        root.entries.add(rBlock);
-//
-//        rBlock = new Section();
-//        block = new BlockOrTag();
-//        block.name = "minecraft:beacon";
-//        rBlock.block = block;
-//
-//        desc = new Descriptor();
-//        desc.type = Restriction.Type.EXPERIENCE;
-//        desc.amount = 20;
-//        rBlock.restrictions.add(desc);
-//
-//        root.entries.add(rBlock);
-//
-//        rBlock = new Section();
-//        block = new BlockOrTag();
-//        block.name = "minecraft:obsidian";
-//        rBlock.block = block;
-//
-//        desc = new Descriptor();
-//        desc.type = Restriction.Type.MINHEIGHT;
-//        desc.amount = 16;
-//        desc.reverse = true;
-//        rBlock.restrictions.add(desc);
-//
-//        root.entries.add(rBlock);
-//
-//        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//        String json = gson.toJson(new RestrictionOrigin(roots));
-//        try {
-//            FileWriter writer = new FileWriter(file);
-//            writer.write(json);
-//            writer.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    public class Root {
-        public ArrayList<Section> entries = new ArrayList<>();
-    }
-
-    public class Section {
-        public ArrayList<Descriptor> restrictions = new ArrayList<>();
     }
 
     public class Descriptor {
         public String type;
         private Integer amount;
-        private Integer exposed;
-        public String name2;
         private Boolean reverse;
         public String dimension;
         public String mod;
@@ -161,9 +85,10 @@ public class RestrictionReader {
         public String tag;
         private Boolean item;
         private Boolean block;
+        public String stage;
 
 
-        public boolean IsReversed() {
+        public boolean isReversed() {
             return reverse != null && reverse;
         }
 
@@ -171,9 +96,6 @@ public class RestrictionReader {
             return amount == null ? 1 : amount;
         }
 
-        public int getExposed(){
-            return exposed == null ? 0 : exposed;
-        }
 
         public boolean isItemRestriction(){
             return item != null && item;
@@ -199,15 +121,6 @@ public class RestrictionReader {
         }
     }
 
-
-    private static class RestrictionOrigin {
-        List<Root> roots;
-
-        public RestrictionOrigin(List<Root> roots) {
-            this.roots = roots;
-        }
-    }
-
     public static class ReloadListener extends JsonReloadListener {
         Gson gson;
 
@@ -218,9 +131,13 @@ public class RestrictionReader {
 
         @Override
         protected void apply(Map<ResourceLocation, JsonElement> objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
-            objectIn.forEach((rl,js)->{
-               readRestrictions(js,gson).forEach(RestrictionManager.INSTANCE::addRestriction);
-            });
+            RestrictionManager.INSTANCE.init();
+            objectIn.forEach((rl,js)-> readRestrictions(js,gson).forEach(RestrictionManager.INSTANCE::addRestriction));
+        }
+
+        @Override
+        protected Map<ResourceLocation, JsonElement> prepare(IResourceManager resourceManagerIn, IProfiler profilerIn) {
+            return super.prepare(resourceManagerIn, profilerIn);
         }
     }
 }

@@ -1,15 +1,13 @@
 package com.davqvist.restriction.RestrictionTypes;
 
-import com.davqvist.restriction.Restriction;
 import com.davqvist.restriction.RestrictionReader;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
+import static com.davqvist.restriction.utility.MessageHelper.*;
 
 public class SeeSkyRestriction extends RestrictionType {
-    public static final ResourceLocation ID = new ResourceLocation(Restriction.MOD_ID, "seesky");
+    public static final String ID =  "seesky";
 
     public SeeSkyRestriction(RestrictionReader.Descriptor descriptor) {
         super(descriptor);
@@ -17,17 +15,17 @@ public class SeeSkyRestriction extends RestrictionType {
 
     @Override
     public boolean test(World world, BlockPos pos, PlayerEntity player) {
-        return world.canSeeSky(pos) != descriptor.IsReversed();
+        return world.canSeeSky(pos) == descriptor.isReversed();
     }
 
     @Override
-    public ResourceLocation getID() {
+    public String getID() {
         return ID;
     }
 
     @Override
     public String getMessage() {
-        return "Block must " + ( descriptor.IsReversed() ? "not " : "" ) + "see the sky.";
+        return getBlockItem(descriptor) + " must " + getNot(descriptor) + "see the sky.";
     }
 
 }
