@@ -6,12 +6,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class OrRestriction extends RestrictionType {
-    public static String ID = "or";
+public class AndRestriction extends RestrictionType{
+    public static String ID = "and";
     RestrictionType first;
     RestrictionType second;
 
-    public OrRestriction(RestrictionReader.Descriptor descriptor) {
+    public AndRestriction(RestrictionReader.Descriptor descriptor) {
         super(descriptor);
         first = RestrictionManager.INSTANCE.RestrictionRegistry.get(descriptor.first.type).apply(descriptor.first);
         second = RestrictionManager.INSTANCE.RestrictionRegistry.get(descriptor.second.type).apply(descriptor.second);
@@ -19,7 +19,7 @@ public class OrRestriction extends RestrictionType {
 
     @Override
     public boolean test(World world, BlockPos pos, PlayerEntity player) {
-        return first.test(world, pos, player) && second.test(world, pos, player);
+        return first.test(world, pos, player) || second.test(world, pos, player);
     }
 
     @Override
@@ -29,6 +29,6 @@ public class OrRestriction extends RestrictionType {
 
     @Override
     public String getMessage() {
-        return first.getMessage() + " or " + second.getMessage();
+        return first.getMessage() + " and " + second.getMessage();
     }
 }

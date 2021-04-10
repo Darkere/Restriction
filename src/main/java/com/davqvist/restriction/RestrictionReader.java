@@ -48,6 +48,19 @@ public class RestrictionReader {
         desc.block = true;
         desc.mod = "minecraft";
 
+        desc = new Descriptor();
+        restrictions.add(desc);
+        desc.tag = "minecraft:beds";
+        desc.type = "or";
+        desc.block = true;
+        desc.first = new Descriptor();
+        desc.first.type = "dimension";
+        desc.first.dimension = "minecraft:overworld";
+        desc.first.reverse = true;
+        desc.second = new Descriptor();
+        desc.second.type = "gamestage";
+        desc.second.stage = "rest";
+
 
         desc = new Descriptor();
         desc.name = "minecraft:stone";
@@ -86,6 +99,8 @@ public class RestrictionReader {
         private Boolean item;
         private Boolean block;
         public String stage;
+        public Descriptor first;
+        public Descriptor second;
 
 
         public boolean isReversed() {

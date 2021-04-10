@@ -1,9 +1,6 @@
 package com.davqvist.restriction;
 
 import com.davqvist.restriction.RestrictionTypes.*;
-import net.darkhax.gamestages.GameStageHelper;
-import net.darkhax.gamestages.GameStages;
-import net.darkhax.gamestages.event.GameStageEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -22,7 +19,7 @@ public class Restriction {
     public static final Logger LOGGER = LogManager.getLogger();
 
     public Restriction() {
-        FMLJavaModLoadingContext.get().getModEventBus().register(this);
+        //FMLJavaModLoadingContext.get().getModEventBus().register(this);
         MinecraftForge.EVENT_BUS.register(new EventHandler());
         MinecraftForge.EVENT_BUS.addListener(RestrictionReader::addReloadListener);
 
@@ -32,16 +29,18 @@ public class Restriction {
         RestrictionManager.INSTANCE.registerRestrictionType(SeeSkyRestriction.ID, SeeSkyRestriction::new);
         RestrictionManager.INSTANCE.registerRestrictionType(GameStageRestriction.ID, GameStageRestriction::new);
         RestrictionManager.INSTANCE.registerRestrictionType(TimeRestriction.ID, TimeRestriction::new);
+        RestrictionManager.INSTANCE.registerRestrictionType(OrRestriction.ID, OrRestriction::new);
+        RestrictionManager.INSTANCE.registerRestrictionType(AndRestriction.ID, AndRestriction::new);
     }
 
     public enum Applicator {
         TAG, NAME, MOD
     }
 
-    @SubscribeEvent
-    public void init(FMLCommonSetupEvent event) {
-        RestrictionReader rr = new RestrictionReader();
-        File file = new File(FMLPaths.CONFIGDIR.get().toFile(), "notatest.json");
-        rr.createTestConfig(file);
-    }
+//    @SubscribeEvent
+//    public void init(FMLCommonSetupEvent event) {
+//        RestrictionReader rr = new RestrictionReader();
+//        File file = new File(FMLPaths.CONFIGDIR.get().toFile(), "notatest.json");
+//        rr.createTestConfig(file);
+//    }
 }
