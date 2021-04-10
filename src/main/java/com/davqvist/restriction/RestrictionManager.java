@@ -129,7 +129,11 @@ public class RestrictionManager {
     }
 
     private boolean testRestriction(World world, BlockPos pos, PlayerEntity player, ResourceLocation name, boolean item) {
-        loadRestrictions.forEach(w->w.accept(world));
+        if(!loadRestrictions.isEmpty()){
+            loadRestrictions.forEach(w->w.accept(world));
+            loadRestrictions.clear();
+        }
+
         Map<Restriction.Applicator, ListMultimap<String, RestrictionType>> map = item ? itemRestrictions : blockRestrictions;
         boolean result = false;
         for (Map.Entry<Restriction.Applicator, ListMultimap<String, RestrictionType>> entry : map.entrySet()) {
