@@ -3,6 +3,7 @@ package com.davqvist.restriction;
 import com.davqvist.restriction.RestrictionTypes.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -27,7 +28,10 @@ public class Restriction {
         RestrictionManager.INSTANCE.registerRestrictionType(HeightRestriction.ID, HeightRestriction::new);
         RestrictionManager.INSTANCE.registerRestrictionType(LevelRestriction.ID, LevelRestriction::new);
         RestrictionManager.INSTANCE.registerRestrictionType(SeeSkyRestriction.ID, SeeSkyRestriction::new);
-        RestrictionManager.INSTANCE.registerRestrictionType(GameStageRestriction.ID, GameStageRestriction::new);
+        if(ModList.get().isLoaded("gamestages")){
+            RestrictionManager.INSTANCE.registerRestrictionType(GameStageRestriction.ID, GameStageRestriction::new);
+        }
+
         RestrictionManager.INSTANCE.registerRestrictionType(TimeRestriction.ID, TimeRestriction::new);
         RestrictionManager.INSTANCE.registerRestrictionType(OrRestriction.ID, OrRestriction::new);
         RestrictionManager.INSTANCE.registerRestrictionType(AndRestriction.ID, AndRestriction::new);

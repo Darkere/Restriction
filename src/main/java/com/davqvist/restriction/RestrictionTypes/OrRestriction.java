@@ -13,8 +13,8 @@ public class OrRestriction extends RestrictionType {
 
     public OrRestriction(RestrictionReader.Descriptor descriptor) {
         super(descriptor);
-        first = RestrictionManager.INSTANCE.RestrictionRegistry.get(descriptor.first.type).apply(descriptor.first);
-        second = RestrictionManager.INSTANCE.RestrictionRegistry.get(descriptor.second.type).apply(descriptor.second);
+        first = RestrictionManager.INSTANCE.createRestriction(descriptor.first);
+        second = RestrictionManager.INSTANCE.createRestriction(descriptor.second);
     }
 
     @Override

@@ -60,7 +60,7 @@ public class RestrictionManager {
                         Restriction.LOGGER.warn("Invalid tag: " + descriptor.tag);
 
                     } else {
-                        blockTags.getAllElements().forEach(block-> blockRestrictions.get(descriptor.getApplicator()).put(block.getRegistryName().toString(), RestrictionRegistry.get(descriptor.type).apply(descriptor)));
+                        blockTags.getAllElements().forEach(block-> AddAndCreateRestriction(descriptor,blockRestrictions,block.getRegistryName().toString()));
                     }
                 }
                 if (descriptor.isItemRestriction()) {
@@ -69,16 +69,31 @@ public class RestrictionManager {
                         Restriction.LOGGER.warn("Invalid tag: " + descriptor.tag);
 
                     } else {
-                        itemTags.getAllElements().forEach(item-> blockRestrictions.get(descriptor.getApplicator()).put(item.getRegistryName().toString(), RestrictionRegistry.get(descriptor.type).apply(descriptor)));
+                        itemTags.getAllElements().forEach(item-> AddAndCreateRestriction(descriptor,itemRestrictions,item.getRegistryName().toString()));
                     }
                 }
             }
 
             if (descriptor.isBlockRestriction())
-                blockRestrictions.get(descriptor.getApplicator()).put(descriptor.getApplicatorString(), RestrictionRegistry.get(descriptor.type).apply(descriptor));
+                AddAndCreateRestriction(descriptor,blockRestrictions,descriptor.getApplicatorString());
             if (descriptor.isItemRestriction())
-                itemRestrictions.get(descriptor.getApplicator()).put(descriptor.getApplicatorString(), RestrictionRegistry.get(descriptor.type).apply(descriptor));
+                AddAndCreateRestriction(descriptor,itemRestrictions, descriptor.getApplicatorString());
         });
+    }
+    public RestrictionType createRestriction(RestrictionReader.Descriptor descriptor){
+        Function<RestrictionReader.Descriptor, RestrictionType> function = RestrictionRegistry.get(descriptor.type);
+        if(function == null){
+            Restriction.LOGGER.error("Restriction Type " + descriptor.type + " does not exist or is not loaded");
+            return null;
+        }
+        return function.apply(descriptor);
+    }
+    private void AddAndCreateRestriction(RestrictionReader.Descriptor descriptor, Map<Restriction.Applicator, ListMultimap<String, RestrictionType>> map, String name) {
+        ListMultimap<String, RestrictionType> multimap = map.get(descriptor.getApplicator());
+        if(multimap == null) return;
+        RestrictionType type = createRestriction(descriptor);
+        if(type == null) return;
+        multimap.put(name,type);
     }
 
     public void registerRestrictionType(String ID, Function<RestrictionReader.Descriptor, RestrictionType> Translator) {
