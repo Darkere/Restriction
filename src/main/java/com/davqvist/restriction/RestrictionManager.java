@@ -150,5 +150,10 @@ public class RestrictionManager {
 
         return result;
     }
+    public void loadRestrictions(World world) {
+        for (Consumer<World> loadRestriction : loadRestrictions) {
+            loadRestriction.accept(world);
+        }
+    }
 
 }

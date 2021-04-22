@@ -7,18 +7,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class EventHandler {
-
-    @SubscribeEvent
-    public void onTooltip(ItemTooltipEvent e) {
-        if (e.getPlayer() == null) return;
-        RestrictionManager.INSTANCE.getMessages(e.getItemStack().getItem()).forEach(txt -> e.getToolTip().add(txt));
-    }
 
     @SubscribeEvent //this event is only called serverside in 1.16
     public void onPlace(BlockEvent.EntityPlaceEvent event) {

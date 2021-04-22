@@ -1,5 +1,7 @@
 package com.davqvist.restriction;
 
+import com.davqvist.restriction.utility.Network;
+import com.davqvist.restriction.utility.RestrictionMessage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -11,6 +13,8 @@ import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -148,6 +152,11 @@ public class RestrictionReader {
         protected void apply(Map<ResourceLocation, JsonElement> objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
             RestrictionManager.INSTANCE.init();
             objectIn.forEach((rl,js)-> readRestrictions(js,gson).forEach(RestrictionManager.INSTANCE::addRestriction));
+            List<JsonElement> list = new ArrayList<>();
+            objectIn.forEach((rl,js)-> list.add(js));
+            if(ServerLifecycleHooks.getCurrentServer() != null && ServerLifecycleHooks.getCurrentServer().isDedicatedServer()){
+                Network.sendToAll(new RestrictionMessage(list));
+            }
         }
 
         @Override
