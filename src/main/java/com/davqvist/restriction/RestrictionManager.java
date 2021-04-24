@@ -1,6 +1,7 @@
 package com.davqvist.restriction;
 
 import com.davqvist.restriction.RestrictionTypes.RestrictionType;
+import com.davqvist.restriction.utility.RestrictionMessage;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import net.minecraft.block.Block;
@@ -13,7 +14,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class RestrictionManager {
     public static final RestrictionManager INSTANCE = new RestrictionManager();
@@ -29,7 +30,7 @@ public class RestrictionManager {
     public final Map<String, Function<RestrictionReader.Descriptor, RestrictionType>> RestrictionRegistry = new HashMap<>();
     private final Map<Restriction.Applicator, Function<ResourceLocation, String>> RSTransformer = new HashMap<>();
     private final List<Consumer<World>> loadRestrictions = new ArrayList<>();
-
+    public RestrictionMessage LogInMessage;
 
     public RestrictionManager() {
         init();
@@ -125,7 +126,7 @@ public class RestrictionManager {
             }
         }
 
-        return text;
+        return text.stream().distinct().collect(Collectors.toList());
     }
 
     private boolean testRestriction(World world, BlockPos pos, PlayerEntity player, ResourceLocation name, boolean item) {
@@ -154,6 +155,7 @@ public class RestrictionManager {
         for (Consumer<World> loadRestriction : loadRestrictions) {
             loadRestriction.accept(world);
         }
+        loadRestrictions.clear();
     }
 
 }

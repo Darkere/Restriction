@@ -1,6 +1,7 @@
 package com.davqvist.restriction.utility;
 
 import com.davqvist.restriction.Restriction;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -14,6 +15,9 @@ public class Network {
 
     public static void sendToAll(Object Message){
         Network.INSTANCE.send(PacketDistributor.ALL.noArg(),Message);
+    }
+    public static void sendToPlayer(ServerPlayerEntity player, Object Message){
+        Network.INSTANCE.send(PacketDistributor.PLAYER.with(()->player),Message );
     }
 
     public static void register() {

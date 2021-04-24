@@ -21,12 +21,13 @@ public class MessageHelper {
     }
 
     public static String getBlockItem(RestrictionReader.Descriptor desc) {
-        if (desc.isBlockRestriction()) {
-            return "Block";
+        if (desc.isBlockRestriction() && desc.isItemRestriction()) {
+            return "Block/Item";
         } else if (desc.isItemRestriction()) {
             return "Item";
+        } else if (desc.isBlockRestriction()){
+            return "Block";
         }
-
         return "";
     }
 }

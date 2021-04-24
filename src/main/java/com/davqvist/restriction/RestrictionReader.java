@@ -154,8 +154,9 @@ public class RestrictionReader {
             objectIn.forEach((rl,js)-> readRestrictions(js,gson).forEach(RestrictionManager.INSTANCE::addRestriction));
             List<JsonElement> list = new ArrayList<>();
             objectIn.forEach((rl,js)-> list.add(js));
+            RestrictionManager.INSTANCE.LogInMessage = new RestrictionMessage(list);
             if(ServerLifecycleHooks.getCurrentServer() != null && ServerLifecycleHooks.getCurrentServer().isDedicatedServer()){
-                Network.sendToAll(new RestrictionMessage(list));
+                Network.sendToAll(RestrictionManager.INSTANCE.LogInMessage);
             }
         }
 

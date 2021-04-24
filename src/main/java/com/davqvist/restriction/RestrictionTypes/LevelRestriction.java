@@ -15,7 +15,7 @@ public class LevelRestriction extends RestrictionType {
 
     @Override
     public boolean test(World world, BlockPos pos, PlayerEntity player) {
-        return player.experienceLevel > descriptor.getAmount() == descriptor.isReversed();
+        return player.experienceLevel >= descriptor.getAmount() == descriptor.isReversed();
     }
 
     @Override
